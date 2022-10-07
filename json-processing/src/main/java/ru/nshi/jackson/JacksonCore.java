@@ -34,17 +34,17 @@ public class JacksonCore {
                 continue;
             }
             Duration duration = Duration.of(trackResult.getTrackTimeMillis(),
-                    ChronoUnit.MILLIS);
+                ChronoUnit.MILLIS);
             String artistName = getArtistNameById(trackResult.getArtist());
             TrackResponse response = new TrackResponse(trackResult.getTrackName(), artistName, trackResult.getCountry(),
-                    duration.toString());
+                duration.toString());
             System.out.println(mapper.writeValueAsString(response));
         }
     }
 
     public static void parseUseJsonPath(JsonNode node) throws JsonProcessingException {
         int resultCount = node
-                .at("/resultCount").asInt();
+            .at("/resultCount").asInt();
 
         System.out.println("Results count: " + resultCount);
 
@@ -56,7 +56,7 @@ public class JacksonCore {
                 continue;
             }
             long artistId = artistIdNode
-                    .asLong();
+                .asLong();
 
             String artistName = getArtistNameById(artistId);
             String trackName = result.get("trackName").asText();
@@ -66,13 +66,13 @@ public class JacksonCore {
             Duration duration = Duration.of(trackTimeMillis, ChronoUnit.MILLIS);
 
             ObjectNode objectNode = mapper.createObjectNode()
-                    .put("artistName", artistName)
-                    .put("trackName", trackName)
-                    .put("trackTime", duration.toString())
-                    .put("country", country);
+                .put("artistName", artistName)
+                .put("trackName", trackName)
+                .put("trackTime", duration.toString())
+                .put("country", country);
 
             System.out.println(mapper.writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(objectNode));
+                .writeValueAsString(objectNode));
         }
     }
 
