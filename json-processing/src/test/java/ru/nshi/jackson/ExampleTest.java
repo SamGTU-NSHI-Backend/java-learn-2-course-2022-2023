@@ -1,4 +1,4 @@
-package ru.nshi;
+package ru.nshi.jackson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 public class ExampleTest {
     ObjectMapper mapper = new ObjectMapper();
+
     @Test
     void testJackson() throws JsonProcessingException {
         ExampleModel exampleModel = new ExampleModel(123L);
@@ -15,7 +16,7 @@ public class ExampleTest {
         Assertions.assertEquals("{\"prop\":123}", actual);
     }
 
-    public static class ExampleModel{
+    public static class ExampleModel {
         @JsonProperty(value = "prop")
         private Long id;
 
