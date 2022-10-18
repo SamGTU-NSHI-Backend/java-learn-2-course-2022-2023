@@ -5,24 +5,62 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JacksonCore {
-    public static final String JSON_PATH = "json-processing/src/main/resources/example.json";
+    public static final String API_BASE = "https://itunes.apple.com/";
+    public static final String SEARCH_SUFFIX = "search";
+    public static final String LOOKUP_SUFFIX = "lookup";
+
+    public static final HttpClient client = HttpClient.newHttpClient();
 
     public static final ObjectMapper mapper = new ObjectMapper();
 
-    public static void main(String[] args) throws IOException, NoSuchFieldException, IllegalAccessException {
+    public static void main(String[] args) throws IOException, NoSuchFieldException, IllegalAccessException, InterruptedException {
         mapper.findAndRegisterModules();
-        try (InputStream stream = new FileInputStream(JSON_PATH)) {
-            JsonNode node = mapper.readTree(stream);
-//            parseUseJsonPath(node);
-            parseUseClasses(node);
+
+        HttpResponse<String> response = searchSongs("AC/DC", 10, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        if (response.statusCode() >= 300) {
+            System.out.println("Error: " + response.body());
+            return;
         }
+
+        JsonNode node = mapper.readTree(response.body());
+//        parseUseJsonPath(node);
+        parseUseClasses(node);
+    }
+
+    static URI createUri(String base, Map<String, ?> params) {
+        String paramsStr = params.entrySet().stream()
+            .map(p -> p.getKey() + "=" + URLEncoder.encode(p.getValue().toString(), StandardCharsets.UTF_8))
+            .collect(Collectors.joining("&"));
+        return URI.create(base + "?" + paramsStr);
+    }
+
+    static <T> HttpResponse<T> searchSongs(String artistName, int limit, HttpResponse.BodyHandler<T> handler) throws IOException, InterruptedException {
+        Map<String, ?> params = Map.of("limit", limit,
+            "term", artistName,
+            "media", "music",
+            "entity", "song",
+            "attribute", "artistTerm");
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(createUri(API_BASE + SEARCH_SUFFIX, params))
+            .build();
+
+        return client.send(request, handler);
     }
 
     public static void parseUseClasses(JsonNode node) throws JsonProcessingException, NoSuchFieldException, IllegalAccessException {
@@ -37,7 +75,7 @@ public class JacksonCore {
                 ChronoUnit.MILLIS);
             String artistName = getArtistNameById(trackResult.getArtist());
             TrackResponse response = new TrackResponse(trackResult.getTrackName(), artistName, trackResult.getCountry(),
-                duration.toString());
+                duration.toString(), trackResult.getArtist());
             System.out.println(mapper.writeValueAsString(response));
         }
     }
@@ -77,6 +115,22 @@ public class JacksonCore {
     }
 
     public static String getArtistNameById(long artistId) {
-        return "George Strait";
+        Map<String, ?> params = Map.of("id", artistId);
+        HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(createUri(API_BASE + LOOKUP_SUFFIX, params)).build();
+        HttpResponse<InputStream> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            JsonNode jsonNode = mapper.readTree(response.body());
+            if (jsonNode.at("/resultCount").asLong() < 1) {
+                throw new RuntimeException("Result list is empty");
+            }
+            jsonNode = jsonNode.at("/results");
+            String name = jsonNode.get(0).at("/artistName").asText("George Strait");
+            return name;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

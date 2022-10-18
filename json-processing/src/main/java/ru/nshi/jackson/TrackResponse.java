@@ -3,17 +3,19 @@ package ru.nshi.jackson;
 public class TrackResponse {
     private String trackName;
     private String artistName;
+    private Long artistId;
     private String country;
     private String trackTime;
 
     public TrackResponse() {
     }
 
-    public TrackResponse(String trackName, String artistName, String country, String trackTime) {
+    public TrackResponse(String trackName, String artistName, String country, String trackTime, Long artistId) {
         this.trackName = trackName;
         this.artistName = artistName;
         this.country = country;
         this.trackTime = trackTime;
+        this.artistId = artistId;
     }
 
     public String getTrackName() {
@@ -46,5 +48,13 @@ public class TrackResponse {
 
     public void setTrackTime(String trackTime) {
         this.trackTime = trackTime;
+    }
+
+    public Long getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
     }
 }
