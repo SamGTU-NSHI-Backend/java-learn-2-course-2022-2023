@@ -12,7 +12,7 @@ public class ExampleTest {
     void testJackson() throws JsonProcessingException {
         ExampleModel exampleModel = new ExampleModel(123L);
         String actual = mapper.writeValueAsString(exampleModel);
-        Assertions.assertEquals("{\"prop\": 123}", actual);
+        Assertions.assertEquals("{\"prop\":123}", actual);
     }
 
     public static class ExampleModel{
