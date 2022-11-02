@@ -1,0 +1,91 @@
+openapi: "3.0.2"
+info:
+  title: Sorting service API
+  version: "0.0.1"
+servers:
+  - url: https://localhost:8080/
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Task 1
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
+  /sorting:
+    post:
+      tags:
+        - Task 2
+      parameters:
+        - in: query
+          name: algorithm
+          schema:
+            type: string
+            default: bubble
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SortRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SortResponse'
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Sorting type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    SortRequest:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+            nullable: false
+      example:
+        values: [ 7, 2, 3, 4, 1 ]
+    SortResponse:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+        time:
+          type: number
+      example:
+        values: [ 1, 2, 3, 4, 7 ]
+        type: 100
+
+    Error:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+      example:
+        errorMessage: Array is null
