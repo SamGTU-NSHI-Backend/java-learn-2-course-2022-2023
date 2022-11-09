@@ -80,7 +80,7 @@ components:
           type: number
       example:
         values: [ 1, 2, 3, 4, 7 ]
-        type: 100
+        tipe: 100
 
     Error:
       type: object
