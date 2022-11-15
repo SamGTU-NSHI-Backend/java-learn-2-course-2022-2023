@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.nshi.error.MessageNotFoundException;
+import ru.nshi.error.MessageValidationException;
 import ru.nshi.model.Error;
 import ru.nshi.model.Message;
 import ru.nshi.service.MessageService;
@@ -61,15 +61,15 @@ public class SampleController {
     @PostMapping
     public Message createMessage(@RequestBody(required = false) Message message) {
         if (message == null || message.getValue() == null) {
-            throw new MessageNotFoundException("message is null");
+            throw new MessageValidationException("message is null");
         }
         message = service.doHandleMessage(message);
         return message;
     }
 
-    @ExceptionHandler({MessageNotFoundException.class})
+    @ExceptionHandler({MessageValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Error handleNotFound(MessageNotFoundException ex) {
+    public Error handleNotFound(MessageValidationException ex) {
         return new Error(ex.getMessage());
     }
 }

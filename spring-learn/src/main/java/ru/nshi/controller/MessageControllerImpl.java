@@ -2,7 +2,9 @@ package ru.nshi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.nshi.error.MessageException;
 import ru.nshi.error.MessageNotFoundException;
 import ru.nshi.error.MessageValidationException;
@@ -47,6 +49,24 @@ public class MessageControllerImpl implements MessageController {
         return service.deleteById(id);
     }
 
+    @ExceptionHandler(MessageValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handleValidationException(MessageValidationException ex) {
+        return new Error(ex.getMessage());
+    }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Error handleNotFoundException(MessageNotFoundException ex) {
+        return new Error(ex.getMessage());
+    }
+
+    @ExceptionHandler(MessageException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handleNotFoundException(MessageException ex) {
+        return new Error(ex.getMessage());
+    }
+
     void checkId(Integer id) {
         if (id == null) {
             throw new MessageValidationException("message id cannot by null");
@@ -65,23 +85,5 @@ public class MessageControllerImpl implements MessageController {
             throw new MessageValidationException("message cannot be empty");
         }
         message.setValue(strip);
-    }
-
-    @ExceptionHandler(MessageValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Error handleValidationException(MessageValidationException ex) {
-        return new Error(ex.getMessage());
-    }
-
-    @ExceptionHandler(MessageNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Error handleNotFoundException(MessageNotFoundException ex) {
-        return new Error(ex.getMessage());
-    }
-
-    @ExceptionHandler(MessageException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Error handleNotFoundException(MessageException ex) {
-        return new Error(ex.getMessage());
     }
 }
