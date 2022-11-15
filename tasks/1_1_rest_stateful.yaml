@@ -1,0 +1,294 @@
+openapi: "3.0.2"
+info:
+  title: Music Storage API
+  version: "0.0.1"
+servers:
+  - url: http://localhost:8080/
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Health
+      description: Health check
+      operationId: healthcheck
+      summary: healthcheck
+      responses:
+        200:
+          $ref: '#/components/responses/HealthCheck'
+
+  /songs:
+    get:
+      tags:
+        - Song
+      description: Get all songs
+      operationId: getSongs
+      summary: getSongs
+      responses:
+        200:
+          $ref: '#/components/responses/Songs'
+    post:
+      tags:
+        - Song
+      description: Create song
+      operationId: createSong
+      summary: createSong
+      requestBody:
+        $ref: "#/components/requestBodies/CreateSong"
+      responses:
+        200:
+          $ref: '#/components/responses/Song'
+        400:
+          $ref: '#/components/responses/InputValidationError'
+
+  /songs/listen:
+    get:
+      tags:
+        - Listen
+      description: Get sorted songs by auditions
+      operationId: getSortedSongsByAuditions
+      summary: getSortedSongsByAuditions
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        200:
+          $ref: '#/components/responses/Songs'
+    post:
+      tags:
+        - Listen
+      description: Listen songs by ID
+      operationId: listenSongByIds
+      summary: listenSongByIds
+      requestBody:
+        $ref: "#/components/requestBodies/ListenSongs"
+      responses:
+        200:
+          $ref: '#/components/responses/Songs'
+        400:
+          $ref: '#/components/responses/InputValidationError'
+
+  /songs/${id}:
+    get:
+      tags:
+        - Song
+      description: Get song by ID
+      operationId: getSongById
+      summary: getSongById
+      parameters:
+        - $ref: '#/components/parameters/SongPathId'
+      responses:
+        200:
+          $ref: '#/components/responses/Song'
+        404:
+          $ref: '#/components/responses/SongNotFoundError'
+
+    put:
+      tags:
+        - Song
+      description: Update song by ID
+      operationId: updateSongById
+      summary: updateSongById
+      parameters:
+        - $ref: '#/components/parameters/SongPathId'
+      requestBody:
+        $ref: "#/components/requestBodies/CreateSong"
+      responses:
+        200:
+          $ref: '#/components/responses/Song'
+        400:
+          $ref: '#/components/responses/InputValidationError'
+        404:
+          $ref: '#/components/responses/SongNotFoundError'
+
+    delete:
+      tags:
+        - Song
+      description: Delete song by ID
+      operationId: deleteSongById
+      summary: deleteSongById
+      parameters:
+        - $ref: '#/components/parameters/SongPathId'
+      responses:
+        200:
+          $ref: '#/components/responses/Song'
+        404:
+          $ref: '#/components/responses/SongNotFoundError'
+
+  /songs/${id}/listen:
+    post:
+      tags:
+        - Listen
+      description: Listen song by ID
+      operationId: listenSongById
+      summary: listenSongById
+      parameters:
+        - $ref: '#/components/parameters/SongPathId'
+      requestBody:
+        $ref: "#/components/requestBodies/ListenSong"
+      responses:
+        200:
+          $ref: '#/components/responses/Song'
+        400:
+          $ref: '#/components/responses/InputValidationError'
+        404:
+          $ref: '#/components/responses/SongNotFoundError'
+
+components:
+  parameters:
+    SongPathId:
+      name: id
+      in: path
+      description: Song ID
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        
+    LimitQuery:
+      name: limit
+      in: query
+      description: Result count
+      schema:
+        type: integer
+        minimum: 1
+        default: 5
+  
+  requestBodies:
+    ListenSong:
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ListenSong"
+
+    ListenSongs:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ListenSongs"
+
+    CreateSong:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CreateSong"
+
+
+  responses:
+    HealthCheck:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - UP
+                  - DOWN
+                nullable: false
+
+    SongNotFoundError:
+      description: Song not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    
+    InputValidationError:
+      description: Invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    
+    Song:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Song"
+
+    Songs:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Songs"
+
+  schemas:
+    Song:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          minimum: 1
+      allOf:
+        - $ref: '#/components/schemas/CreateSong'
+      example:
+        id: 1
+        artistName: Nirvana
+        name: Smells Like Teen Spirit
+        auditions: 100
+
+    Songs:
+      type: array
+      items:
+        $ref: "#/components/schemas/Song"
+
+    ListenSong:
+      type: object
+      properties:
+        auditions:
+          type: integer
+          minimum: 1
+          default: 1
+      example:
+        auditions: 1
+
+    ListenSongs:
+      type: object
+      properties:
+        songs:
+          type: array
+          nullable: false
+          items:
+            type: integer
+            nullable: false
+            minimum: 1
+      allOf:
+        - $ref: '#/components/schemas/ListenSong'
+      example:
+        auditions: 1
+        songs: [1, 2, 3]
+
+    CreateSong:
+      type: object
+      properties:
+        artistName:
+          type: string
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        auditions:
+          type: integer
+          minimum: 0
+          default: 0
+      example:
+        artistName: Nirvana
+        name: Smells Like Teen Spirit
+        auditions: 100
+
+    Error:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          nullable: false
+      example:
+        errorMessage: error.message

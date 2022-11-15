@@ -8,6 +8,7 @@
 
 1. [Массивы и JSON](tasks/0_1_Arrays.md)
 2. [Сервлеты](tasks/0_2_Servlets.md)
+3. [Stateful Service](tasks/1_1_rest_stateful.md)
 
 ### Как выкладывать решения задач
 
