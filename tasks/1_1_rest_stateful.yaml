@@ -67,7 +67,7 @@ paths:
         400:
           $ref: '#/components/responses/InputValidationError'
 
-  /songs/${id}:
+  /songs/{id}:
     get:
       tags:
         - Song
@@ -114,7 +114,7 @@ paths:
         404:
           $ref: '#/components/responses/SongNotFoundError'
 
-  /songs/${id}/listen:
+  /songs/{id}/listen:
     post:
       tags:
         - Listen
