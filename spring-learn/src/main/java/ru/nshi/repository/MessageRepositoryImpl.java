@@ -40,9 +40,6 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public Message updateById(Integer id, Message message) {
         Message oldValue = getById(id);
-        if (oldValue == null) {
-            throw new MessageNotFoundException("message not found");
-        }
         message.setId(id);
         data.put(id, message);
         return message;
