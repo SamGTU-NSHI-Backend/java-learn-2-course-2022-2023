@@ -7,8 +7,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DemoApplication {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context =
-            SpringApplication.run(DemoApplication.class, args);
+        SpringApplication application = new SpringApplication(DemoApplication.class);
+        ConfigurableApplicationContext context = application.run(args);
+        System.out.println("Context up");
 
         String[] beanDefinitionNames = context.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
