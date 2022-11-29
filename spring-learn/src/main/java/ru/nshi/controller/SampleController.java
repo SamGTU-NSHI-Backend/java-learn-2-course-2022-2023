@@ -53,9 +53,7 @@ public class SampleController {
     @GetMapping("/message")
     @PreDestroy
     public Message getMessage() {
-        Message body = new Message();
-        body.setValue("message");
-        return body;
+        return new Message("message");
     }
 
     @PostMapping
