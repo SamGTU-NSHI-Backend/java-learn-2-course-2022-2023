@@ -64,8 +64,8 @@ public class MessageRepositoryImpl implements MessageRepository {
 
     @PostConstruct
     public void setup() {
-        int id = autoId.incrementAndGet();
-        data.put(id, new Message(id, defaultMessage));
+//        int id = autoId.incrementAndGet();
+//        data.put(id, new Message(id, defaultMessage));
         System.out.println("Repository created");
     }
 
