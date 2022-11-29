@@ -1,34 +1,21 @@
 package ru.nshi.model;
 
-public class Message {
-    private String value;
-    private Integer id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-    public Message() {
-    }
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+@Data
+public class Message {
+    @EqualsAndHashCode.Include
+    private Integer id;
+    @ToString.Include
+    private String value;
 
     public Message(String value) {
         this.value = value;
-    }
-
-    public Message(String value, Integer id) {
-        this.value = value;
-        this.id = id;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 }
