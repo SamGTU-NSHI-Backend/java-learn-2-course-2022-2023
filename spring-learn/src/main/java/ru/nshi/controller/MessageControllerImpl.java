@@ -16,8 +16,12 @@ import java.util.List;
 
 @RestController
 public class MessageControllerImpl implements MessageController {
-    @Autowired
     private MessageService service;
+    
+    @Autowired
+    public void setService(MessageService service) {
+        this.service = service;
+    }
 
     @Override
     public List<Message> getMessages() {
