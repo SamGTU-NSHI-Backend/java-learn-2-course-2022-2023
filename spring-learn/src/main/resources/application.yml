@@ -8,7 +8,7 @@ server:
 application:
   auto-id:
     start: 100
-  message.default-value: ${MESSAGE_DEFAULT}
+  message.default-value: ${MESSAGE_DEFAULT:msg.default}
 
 
 spring:
